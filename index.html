@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+
+    <title>Chips</title>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-4">
+          <div id="hundreds" class="card">
+            <h4 class="text-xs-center card-title"></h4>
+            <p class="card-text"></p>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div id="tens" class="card">
+            <h4 class="text-xs-center card-title"></h4>
+            <p class="card-text"></p>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div id="ones" class="card">
+            <h4 class="text-xs-center card-title"></h4>
+            <p class="card-text"></p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div id="tray" class="card">
+            <h4 class="text-xs-center card-title"></h4>
+            <p class="card-text"></p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-offset-4 col-xs-4">
+          <button id="add-chips">&nbsp;</button>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+    <script>
+      $(window).load(function() {
+        var places = [$("#ones"), $("#tens"), $("#hundreds")];
+        var place_values = [0, 0, 0];
+        var tray_value = 0;
+        function set_place(i, v){
+          places[i].find(".card-title").text(v);
+        }
+
+        function set_places(){
+          var i;
+          for(i = 0;i < places.length;++i){
+            set_place(i, place_values[i]);
+          }
+        }
+        set_places();
+
+        var tray = $("#tray");
+        function load_tray(v){
+          tray_value = v;
+          tray.find(".card-title").text(v);
+        }
+        load_tray(0);
+
+        function distribute_tray(){
+          place_values[0] += tray_value;
+          load_tray(0);
+          for(var i = 0;place_values[i] >= 10;++i){
+            place_values[i+1] += parseInt(place_values[i]/10);
+            place_values[i] %= 10;
+          }
+          set_places();
+        }
+
+        tray.click(distribute_tray);
+
+        $("#add-chips").click(function() {
+          var tray_amount = parseInt(Math.random()*6) + 1;
+          load_tray(tray_amount);
+        });
+      });
+    </script>
+  </body>
+</html>
