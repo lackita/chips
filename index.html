@@ -46,8 +46,13 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw=" crossorigin="anonymous"></script>
     <script>
       $(window).load(function() {
+        function draw_attention(e){
+          e.effect("pulsate", {times: 1, duration: 1250});
+        }
+
         var places = [$("#ones"), $("#tens"), $("#hundreds")];
         var place_values = [0, 0, 0];
         var tray_value = 0;
@@ -63,24 +68,46 @@
         }
         set_places();
 
+        function carry_place(i){
+          if(place_values[i] >= 10){
+            if (place_values[i+1] >= 10){
+              draw_attention(places[i+1]);
+            } else {
+              place_values[i+1] += parseInt(place_values[i]/10);
+              place_values[i] %= 10;
+              set_places();
+            }
+          }
+        }
+
         var tray = $("#tray");
         function load_tray(v){
+          if(tray_value > 0){
+            draw_attention(tray);
+          } else {
+            set_tray(v);
+          }
+        }
+
+        function set_tray(v){
           tray_value = v;
           tray.find(".card-title").text(v);
         }
-        load_tray(0);
+        set_tray(0);
 
-        function distribute_tray(){
-          place_values[0] += tray_value;
-          load_tray(0);
-          for(var i = 0;place_values[i] >= 10;++i){
-            place_values[i+1] += parseInt(place_values[i]/10);
-            place_values[i] %= 10;
+        function empty_tray(){
+          if(place_values[0] < 10){
+            place_values[0] += tray_value;
+            set_tray(0);
+            set_places();
+          } else {
+            draw_attention(places[0]);
           }
-          set_places();
         }
 
-        tray.click(distribute_tray);
+        tray.click(empty_tray);
+        places[0].click(function(){carry_place(0)});
+        places[1].click(function(){carry_place(1)});
 
         $("#add-chips").click(function() {
           var tray_amount = parseInt(Math.random()*6) + 1;
